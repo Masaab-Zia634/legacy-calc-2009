@@ -5,6 +5,7 @@
 #include <string>
 
 #include "LoanCalculator.h"
+using namespace std;
 
 LoanCalculator::LoanCalculator()
     : amountSet_(false),
@@ -25,12 +26,12 @@ LoanCalculator::LoanCalculator()
 double LoanCalculator::calculateLoanBalance()
 {
     if(!amountSet_ || !interestSet_ || !periodElapsedSet_ || !paymentSet_)
-        throw std::invalid_argument("Must set loan amount, interest, and elapsed period for this calculation");
+        throw invalid_argument("Must set loan amount, interest, and elapsed period for this calculation");
 
     if(interestPeriodic_ == 0)
-        throw std::invalid_argument("Interest rate cannot be zero for this calculation");
+        throw invalid_argument("Interest rate cannot be zero for this calculation");
 
-    double factor = std::pow(1 + interestPeriodic_, periodElapsed_);
+    double factor = pow(1 + interestPeriodic_, periodElapsed_);
 
     return (amount_ * factor) -
            ((payment_ / interestPeriodic_) * (factor - 1));
@@ -43,16 +44,16 @@ double LoanCalculator::calculateLoanBalance()
 double LoanCalculator::calculatePayment()
 {
     if(!amountSet_ || !interestSet_ || !periodTotalSet_)
-        throw std::invalid_argument("Must set loan amount, interest, and total period");
+        throw invalid_argument("Must set loan amount, interest, and total period");
 
     if(interestPeriodic_ == 0)
-        throw std::invalid_argument("Interest rate cannot be zero for payment calculation");
+        throw invalid_argument("Interest rate cannot be zero for payment calculation");
 
     double totalAmount = amount_ - initialPayment_;
     totalAmount += openingFee_ + (totalAmount * (openingPercent_ / 100.0));
 
     return (interestPeriodic_ * totalAmount) /
-           (1 - std::pow(1 + interestPeriodic_, -periodTotal_));
+           (1 - pow(1 + interestPeriodic_, -periodTotal_));
 }
 
 /*
@@ -62,17 +63,17 @@ double LoanCalculator::calculatePayment()
 double LoanCalculator::calculateNumberPayments()
 {
     if(!amountSet_ || !interestSet_ || !paymentSet_)
-        throw std::invalid_argument("Must set loan amount, interest, and payment");
+        throw invalid_argument("Must set loan amount, interest, and payment");
 
     if(interestPeriodic_ == 0)
-        throw std::invalid_argument("Interest cannot be zero");
+        throw invalid_argument("Interest cannot be zero");
 
     double ratio = 1.0 - (interestPeriodic_ * amount_ / payment_);
 
     if(ratio <= 0)
-        throw std::invalid_argument("Invalid values: loan or payment too small");
+        throw invalid_argument("Invalid values: loan or payment too small");
 
-    return -std::log(ratio) / std::log(1.0 + interestPeriodic_);
+    return -log(ratio) / log(1.0 + interestPeriodic_);
 }
 
 /*
@@ -82,13 +83,13 @@ double LoanCalculator::calculateNumberPayments()
 double LoanCalculator::calculateLoanAmount()
 {
     if(!paymentSet_ || !interestSet_ || !periodTotalSet_)
-        throw std::invalid_argument("Must set payment, interest, and total period");
+        throw invalid_argument("Must set payment, interest, and total period");
 
     if(interestPeriodic_ == 0)
-        throw std::invalid_argument("Interest cannot be zero");
+        throw invalid_argument("Interest cannot be zero");
 
     return (payment_ / interestPeriodic_) *
-           (1 - std::pow(1 + interestPeriodic_, -periodTotal_));
+           (1 - pow(1 + interestPeriodic_, -periodTotal_));
 }
 
 /*
@@ -99,11 +100,11 @@ double LoanCalculator::calculateLoanAmount()
 double LoanCalculator::calculateInterestRate()
 {
     if(!amountSet_ || !paymentSet_ || !periodTotalSet_)
-        throw std::invalid_argument("Must set amount, payment, and total period");
+        throw invalid_argument("Must set amount, payment, and total period");
 
-    double q = std::log(1.0 + 1.0 / periodTotal_) / std::log(2.0);
-    double base = std::pow((1.0 + payment_ / amount_), 1.0 / q) - 1.0;
-    double monthlyInterest = std::pow(base, q) - 1.0;
+    double q = log(1.0 + 1.0 / periodTotal_) / log(2.0);
+    double base = pow((1.0 + payment_ / amount_), 1.0 / q) - 1.0;
+    double monthlyInterest = pow(base, q) - 1.0;
 
     return monthlyInterest * 12 * 100;  // annual percentage
 }
@@ -111,21 +112,21 @@ double LoanCalculator::calculateInterestRate()
 double LoanCalculator::calculateEffectiveInterestRate()
 {
     if(!amountSet_ || !periodTotalSet_)
-        throw std::invalid_argument("Must set amount and total period");
+        throw invalid_argument("Must set amount and total period");
 
     double payment = calculatePayment();
     double totalAmount = amount_ - initialPayment_;
 
-    double q = std::log(1.0 + 1.0 / periodTotal_) / std::log(2.0);
-    double base = std::pow((1.0 + payment / totalAmount), 1.0 / q) - 1.0;
-    double monthlyInterest = std::pow(base, q) - 1.0;
+    double q = log(1.0 + 1.0 / periodTotal_) / log(2.0);
+    double base = pow((1.0 + payment / totalAmount), 1.0 / q) - 1.0;
+    double monthlyInterest = pow(base, q) - 1.0;
 
     return monthlyInterest * 12 * 100;
 }
 
-std::string LoanCalculator::toString()
+string LoanCalculator::toString()
 {
-    std::stringstream ss;
+    stringstream ss;
 
     if(amountSet_)
         ss << "Initial Amount:      " << amount_ << "\n";
